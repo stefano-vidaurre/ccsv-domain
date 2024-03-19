@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <PackageId>CCSV.Domain</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>Stefano Vidaurre</Authors>
+    <Company>CCSV</Company>
+    <Title>CCSV.Domain</Title>
+    <Description>A simple set of common domain classes.</Description>
+    <PackageTags>CCSV;Domain;DDD</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/stefano-vidaurre/ccsv-domain</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+</Project>
