@@ -4,7 +4,7 @@ namespace CCSV.Domain.Enums;
 
 public static class EnumParser
 {
-    public static TEnum Parse<TEnum>(string value) where TEnum : struct
+    public static TEnum Parse<TEnum>(string? value) where TEnum : struct
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -20,7 +20,7 @@ public static class EnumParser
         return parsed;
     }
 
-    public static bool TryParse<TEnum>(string value, out TEnum parsed) where TEnum : struct
+    public static bool TryParse<TEnum>(string? value, out TEnum parsed) where TEnum : struct
     {
         if (value is null)
         {
