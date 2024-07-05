@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>CCSV.Domain</PackageId>
-    <Version>8.0.1</Version>
+    <Version>8.0.2</Version>
     <Authors>Stefano Vidaurre</Authors>
     <Company>CCSV</Company>
     <Title>CCSV.Domain</Title>
