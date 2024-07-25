@@ -1,6 +1,6 @@
 using CCSV.Domain.Exceptions;
 
-namespace CCSV.Domain.Enums;
+namespace CCSV.Domain.Parsers;
 
 public static class EnumParser
 {
