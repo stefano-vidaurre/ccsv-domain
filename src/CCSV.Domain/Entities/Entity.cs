@@ -10,7 +10,7 @@ public abstract class Entity
     protected Entity(Guid id)
     {
         Id = id;
-        EntityCreationDate = DateTime.Now;
+        EntityCreationDate = DateTime.UtcNow;
         EntityEditionDate = EntityCreationDate;
         EntityConcurrencyToken = Guid.NewGuid();
     }
@@ -66,7 +66,7 @@ public abstract class Entity
 
     public void SetAsEdited()
     {
-        EntityEditionDate = DateTime.Now;
+        EntityEditionDate = DateTime.UtcNow;
         EntityConcurrencyToken = Guid.NewGuid();
     }
 }

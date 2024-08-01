@@ -23,13 +23,12 @@ public static class DateTimeParser
     public static bool TryParseUTC(string? value, out DateTime parsed)
     {
         if (value is null)
-
         {
             parsed = default;
             return false;
         }
 
-        if (!DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsed))
+        if (!DateTime.TryParse(value, CultureInfo.InvariantCulture, out parsed))
         {
             parsed = default;
             return false;
