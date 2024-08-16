@@ -6,12 +6,16 @@ public abstract class Entity
     public Guid EntityConcurrencyToken { get; private set; }
     public DateTime EntityCreationDate { get; private set; }
     public DateTime EntityEditionDate { get; private set; }
+    public DateTime? EntityDeletionDate { get; private set; }
+
+    public bool IsDeleted => EntityDeletionDate is not null;
 
     protected Entity(Guid id)
     {
         Id = id;
         EntityCreationDate = DateTime.UtcNow;
         EntityEditionDate = EntityCreationDate;
+        EntityDeletionDate = null;
         EntityConcurrencyToken = Guid.NewGuid();
     }
 
@@ -68,5 +72,10 @@ public abstract class Entity
     {
         EntityEditionDate = DateTime.UtcNow;
         EntityConcurrencyToken = Guid.NewGuid();
+    }
+
+    public void SetAsDeleted()
+    {
+        EntityDeletionDate = DateTime.UtcNow;
     }
 }
