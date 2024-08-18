@@ -6,16 +6,17 @@ public abstract class Entity
     public Guid EntityConcurrencyToken { get; private set; }
     public DateTime EntityCreationDate { get; private set; }
     public DateTime EntityEditionDate { get; private set; }
-    public DateTime? EntityDeletionDate { get; private set; }
+    public DateTime? EntityDisabledDate { get; private set; }
 
-    public bool IsDeleted => EntityDeletionDate is not null;
+    public bool IsEnabled => EntityDisabledDate is null;
+    public bool IsDisabled => EntityDisabledDate is not null;
 
     protected Entity(Guid id)
     {
         Id = id;
         EntityCreationDate = DateTime.UtcNow;
         EntityEditionDate = EntityCreationDate;
-        EntityDeletionDate = null;
+        EntityDisabledDate = null;
         EntityConcurrencyToken = Guid.NewGuid();
     }
 
@@ -74,8 +75,13 @@ public abstract class Entity
         EntityConcurrencyToken = Guid.NewGuid();
     }
 
-    public void SetAsDeleted()
+    public void SetAsEnabled()
     {
-        EntityDeletionDate = DateTime.UtcNow;
+        EntityDisabledDate = null;
+    }
+
+    public void SetAsDisabled()
+    {
+        EntityDisabledDate = DateTime.UtcNow;
     }
 }
