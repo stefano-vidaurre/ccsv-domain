@@ -19,6 +19,6 @@ public class ValidationResult
 
     public string PrintErrors()
     {
-        return _results.Aggregate("", (acc, error) => acc + error.PrintErrors() + '\n');
+        return _results.Where(result => !result.IsValid).Aggregate("", (acc, error) => acc + error.PrintErrors() + '\n');
     }
 }
