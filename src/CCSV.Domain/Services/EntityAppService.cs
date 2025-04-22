@@ -31,13 +31,13 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery,
             if (filter.EntityCreationDateGreaterThan is not null)
             {
                 DateTime greaterThanDate = DateTimeParser.ParseUTC(filter.EntityCreationDateGreaterThan);
-                query.Where(x => x.EntityCreationDate >= greaterThanDate);
+                query = query.Where(x => x.EntityCreationDate >= greaterThanDate);
             }
 
             if (filter.EntityCreationDateLessThan is not null)
             {
                 DateTime lessThanDate = DateTimeParser.ParseUTC(filter.EntityCreationDateLessThan);
-                query.Where(x => x.EntityCreationDate <= lessThanDate);
+                query = query.Where(x => x.EntityCreationDate <= lessThanDate);
             }
 
             return query
