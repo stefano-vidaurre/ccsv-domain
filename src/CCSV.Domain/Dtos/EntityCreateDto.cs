@@ -2,5 +2,5 @@
 
 public abstract class EntityCreateDto : EntityDto
 {
-    public Guid Id { get; init; }
+    public Guid? Id { get; init; }
 }
