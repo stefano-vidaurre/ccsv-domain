@@ -11,6 +11,7 @@ public interface IEntityAppService<TRead, TCreate, TUpdate, TQuery, TFilter>
 {
     Task<IEnumerable<TQuery>> GetAll(TFilter filter);
     Task<TRead> GetById(Guid id);
+    Task<int> GetLength();
     Task Create(TCreate data);
     Task Update(TUpdate data);
     Task Delete(Guid id);

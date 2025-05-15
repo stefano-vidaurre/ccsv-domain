@@ -56,6 +56,11 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery,
         return _mapper.Map<TEntity, TRead>(entity);
     }
 
+    public Task<int> GetLength()
+    {
+        return _repository.Count();
+    }
+
     public abstract Task Create(TCreate data);
 
     public abstract Task Update(TUpdate data);
