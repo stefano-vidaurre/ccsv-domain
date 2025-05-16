@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using CCSV.Domain.Exceptions;
+﻿using CCSV.Domain.Exceptions;
+using System.Collections;
 
 namespace CCSV.Domain.Entities.Collections;
 

@@ -11,7 +11,7 @@ public abstract class Validator<T> : IValidator<T>
         _rules = new List<IValidationRule<T>>();
     }
 
-    public ValidationRule<T,U> RuleFor<U>(Expression<Func<T, U>> expression)
+    public ValidationRule<T, U> RuleFor<U>(Expression<Func<T, U>> expression)
     {
         ValidationRule<T, U> rule = new ValidationRule<T, U>(expression);
         _rules.Add(rule);

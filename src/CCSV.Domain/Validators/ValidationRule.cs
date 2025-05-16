@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace CCSV.Domain.Validators;
 
-public class ValidationRule<T,U> : IValidationRule<T>
+public class ValidationRule<T, U> : IValidationRule<T>
 {
     private readonly PropertyInfo _propertyInfo;
     private readonly Expression<Func<T, U>> _expression;
@@ -29,7 +29,8 @@ public class ValidationRule<T,U> : IValidationRule<T>
         _components = new List<IValidationRuleComponent<U>>();
     }
 
-    public ValidationRule<T,U> NotNull() {
+    public ValidationRule<T, U> NotNull()
+    {
         _components.Add(new ValidationRuleComponent<U>(value => value != null, "Value cant be null."));
         return this;
     }
@@ -40,7 +41,8 @@ public class ValidationRule<T,U> : IValidationRule<T>
         return this;
     }
 
-    public ValidationRule<T,U> NotEmpty() {
+    public ValidationRule<T, U> NotEmpty()
+    {
         _components.Add(new ValidationRuleComponent<U>(value => !string.IsNullOrEmpty(value == null ? null : value.ToString()), "Value cant be empty."));
         return this;
     }
@@ -51,7 +53,8 @@ public class ValidationRule<T,U> : IValidationRule<T>
         return this;
     }
 
-    public ValidationRule<T,U> NotWhiteSpace() {
+    public ValidationRule<T, U> NotWhiteSpace()
+    {
         _components.Add(new ValidationRuleComponent<U>(value => !string.IsNullOrWhiteSpace(value == null ? null : value.ToString()), "Value cant be empty or white space."));
         return this;
     }
@@ -62,7 +65,8 @@ public class ValidationRule<T,U> : IValidationRule<T>
         return this;
     }
 
-    public ValidationRule<T,U> Check(Expression<Func<U, bool>> expression) {
+    public ValidationRule<T, U> Check(Expression<Func<U, bool>> expression)
+    {
         _components.Add(new ValidationRuleComponent<U>(expression));
         return this;
     }
@@ -76,7 +80,7 @@ public class ValidationRule<T,U> : IValidationRule<T>
     public ValidationRuleResult Validate(T instance)
     {
         U value = _expression.Compile()(instance);
-        
+
         IEnumerable<string> errorMessages = _components.Where(component => !component.Validate(value)).Select(component => component.ErrorMessage);
 
         return new ValidationRuleResult(_propertyInfo, errorMessages);

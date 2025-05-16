@@ -13,7 +13,7 @@ public interface IRepository<TEntity> where TEntity : Entity
     Task<TEntity?> GetByIdOrDefault(Guid id);
     Task<TEntity> GetById(Guid id);
     Task<IEnumerable<TEntity>> GetAll(bool disabledIncluded = false);
-    Task<IEnumerable<TEntity>> GetAll(Func<IQueryable<TEntity>, IQueryable<TEntity>>query, bool disabledIncluded = false);
+    Task<IEnumerable<TEntity>> GetAll(Func<IQueryable<TEntity>, IQueryable<TEntity>> query, bool disabledIncluded = false);
     Task Create(TEntity entity);
     Task Update(TEntity entity);
     Task Delete(TEntity entity);

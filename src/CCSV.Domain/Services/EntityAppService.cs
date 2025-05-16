@@ -3,6 +3,7 @@ using CCSV.Domain.Entities;
 using CCSV.Domain.Mappers;
 using CCSV.Domain.Parsers;
 using CCSV.Domain.Repositories;
+using CCSV.Domain.Validators;
 
 namespace CCSV.Domain.Services;
 
@@ -15,37 +16,41 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery,
     where TFilter : EntityFilterDto
 {
     private readonly IRepository<TEntity> _repository;
+    private readonly IMasterValidator _validator;
     private readonly IMasterMapper _mapper;
 
-    protected EntityAppService(IRepository<TEntity> repository, IMasterMapper mapper)
+    protected EntityAppService(IRepository<TEntity> repository, IMasterMapper mapper, IMasterValidator validator)
     {
         _repository = repository;
+        _validator = validator;
         _mapper = mapper;
     }
 
     public virtual async Task<IEnumerable<TQuery>> GetAll(TFilter filter)
     {
-        IEnumerable<TEntity> entities = await _repository.GetAll(query =>
-        {
-            query = ApplyFilter(query, filter);
-            if (filter.EntityCreationDateGreaterThan is not null)
-            {
-                DateTime greaterThanDate = DateTimeParser.ParseUTC(filter.EntityCreationDateGreaterThan);
-                query = query.Where(x => x.EntityCreationDate >= greaterThanDate);
-            }
-
-            if (filter.EntityCreationDateLessThan is not null)
-            {
-                DateTime lessThanDate = DateTimeParser.ParseUTC(filter.EntityCreationDateLessThan);
-                query = query.Where(x => x.EntityCreationDate <= lessThanDate);
-            }
-
-            return query
-                .OrderBy(x => x.EntityCreationDate)
-                .Skip(filter.Index * filter.Size)
-                .Take(filter.Size);
-        }, filter.DisabledIncluded);
+        IEnumerable<TEntity> entities = await _repository.GetAll(query => CreateQuery(query, filter), filter.DisabledIncluded);
         return _mapper.Map<IEnumerable<TEntity>, IEnumerable<TQuery>>(entities);
+    }
+
+    private IQueryable<TEntity> CreateQuery(IQueryable<TEntity> query, TFilter filter)
+    {
+        IQueryable<TEntity> queryWithFilters = ApplyFilter(query, filter);
+        if (filter.EntityCreationDateGreaterThan is not null)
+        {
+            DateTime greaterThanDate = DateTimeParser.ParseUTC(filter.EntityCreationDateGreaterThan);
+            queryWithFilters = query.Where(x => x.EntityCreationDate >= greaterThanDate);
+        }
+
+        if (filter.EntityCreationDateLessThan is not null)
+        {
+            DateTime lessThanDate = DateTimeParser.ParseUTC(filter.EntityCreationDateLessThan);
+            queryWithFilters = query.Where(x => x.EntityCreationDate <= lessThanDate);
+        }
+
+        return queryWithFilters
+            .OrderBy(x => x.EntityCreationDate)
+            .Skip(filter.Index * filter.Size)
+            .Take(filter.Size);
     }
 
     protected abstract IQueryable<TEntity> ApplyFilter(IQueryable<TEntity> query, TFilter filter);
@@ -56,14 +61,28 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery,
         return _mapper.Map<TEntity, TRead>(entity);
     }
 
-    public Task<int> GetLength()
+    public virtual Task<int> GetLength(TFilter filter)
     {
-        return _repository.Count();
+        return _repository.Count(query => CreateQuery(query, filter), filter.DisabledIncluded);
     }
 
-    public abstract Task Create(TCreate data);
+    public virtual async Task Create(TCreate data)
+    {
+        _validator.Validate(data);
+        TEntity entity = CreateEntity(data);
+        await _repository.Create(entity);
+    }
 
-    public abstract Task Update(TUpdate data);
+    protected abstract TEntity CreateEntity(TCreate data);
+
+    public virtual async Task Update(Guid id, TUpdate data)
+    {
+        _validator.Validate(data);
+        TEntity entity = await _repository.GetById(id);
+        UpdateEntity(entity, data);
+    }
+
+    protected abstract void UpdateEntity(TEntity entity, TUpdate data);
 
     public virtual async Task Delete(Guid id)
     {

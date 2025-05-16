@@ -1,5 +1,5 @@
-using System.Globalization;
 using CCSV.Domain.Exceptions;
+using System.Globalization;
 
 namespace CCSV.Domain.Parsers;
 
