@@ -65,6 +65,21 @@ public abstract class RestProvider<TRead, TCreate, TUpdate, TQuery, TFilter> : I
         return _httpClient.Get<TRead>($"{ResourceUri}/{id}", headers);
     }
 
+    public Task<TRead?> GetByIdOrDefault(Guid id)
+    {
+        return _httpClient.GetOrDefault<TRead>($"{ResourceUri}/{id}");
+    }
+
+    public Task<TRead?> GetByIdOrDefault(Guid id, Guid idempotencyKey)
+    {
+        IDictionary<string, string?> headers = new Dictionary<string, string?>()
+        {
+            { IdempotencyKey, idempotencyKey.ToString() }
+        };
+
+        return _httpClient.GetOrDefault<TRead>($"{ResourceUri}/{id}", headers);
+    }
+
     public Task Post(TCreate data)
     {
         return _httpClient.Post(ResourceUri, data);
