@@ -7,11 +7,39 @@ using CCSV.Domain.Validators;
 
 namespace CCSV.Domain.Services;
 
-public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery, TFilter> : IEntityAppService<TRead, TCreate, TUpdate, TQuery, TFilter>
+public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery, TFilter> :
+    EntityAppService<TEntity, TRead, TCreate, TQuery, TFilter>,
+    IEntityAppService<TRead, TCreate, TUpdate, TQuery, TFilter>
+        where TEntity : Entity
+        where TRead : EntityReadDto
+        where TCreate : EntityCreateDto
+        where TUpdate : EntityUpdateDto
+        where TQuery : EntityQueryDto
+        where TFilter : EntityFilterDto
+{
+    private readonly IRepository<TEntity> _repository;
+    private readonly IMasterValidator _validator;
+
+    protected EntityAppService(IRepository<TEntity> repository, IMasterMapper mapper, IMasterValidator validator) : base(repository, mapper, validator)
+    {
+        _repository = repository;
+        _validator = validator;
+    }
+
+    public virtual async Task Update(Guid id, TUpdate data)
+    {
+        _validator.Validate(data);
+        TEntity entity = await _repository.GetById(id);
+        UpdateEntity(entity, data);
+    }
+
+    protected abstract void UpdateEntity(TEntity entity, TUpdate data);
+}
+
+public abstract class EntityAppService<TEntity, TRead, TCreate, TQuery, TFilter> : IEntityAppService<TRead, TCreate, TQuery, TFilter>
     where TEntity : Entity
     where TRead : EntityReadDto
     where TCreate : EntityCreateDto
-    where TUpdate : EntityUpdateDto
     where TQuery : EntityQueryDto
     where TFilter : EntityFilterDto
 {
@@ -74,15 +102,6 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery,
     }
 
     protected abstract TEntity CreateEntity(TCreate data);
-
-    public virtual async Task Update(Guid id, TUpdate data)
-    {
-        _validator.Validate(data);
-        TEntity entity = await _repository.GetById(id);
-        UpdateEntity(entity, data);
-    }
-
-    protected abstract void UpdateEntity(TEntity entity, TUpdate data);
 
     public virtual async Task Delete(Guid id)
     {

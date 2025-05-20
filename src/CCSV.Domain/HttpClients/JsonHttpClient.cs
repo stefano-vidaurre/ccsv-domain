@@ -45,7 +45,7 @@ public class JsonHttpClient : IJsonHttpClient
         return property.Name + "=" + HttpUtility.UrlEncode(property.GetValue(input, null)!.ToString());
     }
 
-    public async Task<T> Get<T>(string uri)
+    public virtual async Task<T> Get<T>(string uri)
     {
         T? result = await GetOrDefault<T>(uri);
 
@@ -57,7 +57,7 @@ public class JsonHttpClient : IJsonHttpClient
         return result;
     }
 
-    public async Task<T> Get<T>(string uri, IDictionary<string, string?> headers)
+    public virtual async Task<T> Get<T>(string uri, IDictionary<string, string?> headers)
     {
         T? result = await GetOrDefault<T>(uri, headers);
 
@@ -69,7 +69,7 @@ public class JsonHttpClient : IJsonHttpClient
         return result;
     }
 
-    public async Task<T?> GetOrDefault<T>(string uri)
+    public virtual async Task<T?> GetOrDefault<T>(string uri)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync(uri);
 
@@ -87,7 +87,7 @@ public class JsonHttpClient : IJsonHttpClient
         return result ?? throw new BusinessException($"It is not possible to parse the body to the ({nameof(T)}) type");
     }
 
-    public async Task<T?> GetOrDefault<T>(string uri, IDictionary<string, string?> headers)
+    public virtual async Task<T?> GetOrDefault<T>(string uri, IDictionary<string, string?> headers)
     {
         using HttpRequestMessage request = new HttpRequestMessage()
         {
@@ -116,7 +116,7 @@ public class JsonHttpClient : IJsonHttpClient
         return result ?? throw new BusinessException($"It is not possible to parse the body to the ({nameof(T)}) type");
     }
 
-    public async Task Post(string uri)
+    public virtual async Task Post(string uri)
     {
         StringContent request = new StringContent("", Encoding.UTF8, "text/plain");
         using HttpResponseMessage response = await _httpClient.PostAsync(uri, request);
@@ -127,39 +127,9 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Post(string uri, IDictionary<string, string?> headers)
+    public virtual async Task Post(string uri, IDictionary<string, string?> headers)
     {
         StringContent request = new StringContent("", Encoding.UTF8, "text/plain");
-
-        foreach (KeyValuePair<string, string?> header in headers)
-        {
-            request.Headers.Add(header.Key, header.Value);
-        }
-
-        using HttpResponseMessage response = await _httpClient.PostAsync(uri, request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            await HandleError(uri, response);
-        }
-    }
-
-    public async Task Post<T>(string uri, T value)
-    {
-        string json = JsonSerializer.Serialize(value);
-        StringContent request = new StringContent(json, Encoding.UTF8, "application/json");
-        using HttpResponseMessage response = await _httpClient.PostAsync(uri, request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            await HandleError(uri, response);
-        }
-    }
-
-    public async Task Post<T>(string uri, T value, IDictionary<string, string?> headers)
-    {
-        string json = JsonSerializer.Serialize(value);
-        StringContent request = new StringContent(json, Encoding.UTF8, "application/json");
 
         foreach (KeyValuePair<string, string?> header in headers)
         {
@@ -174,7 +144,37 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Put(string uri)
+    public virtual async Task Post<T>(string uri, T value)
+    {
+        string json = JsonSerializer.Serialize(value);
+        StringContent request = new StringContent(json, Encoding.UTF8, "application/json");
+        using HttpResponseMessage response = await _httpClient.PostAsync(uri, request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleError(uri, response);
+        }
+    }
+
+    public virtual async Task Post<T>(string uri, T value, IDictionary<string, string?> headers)
+    {
+        string json = JsonSerializer.Serialize(value);
+        StringContent request = new StringContent(json, Encoding.UTF8, "application/json");
+
+        foreach (KeyValuePair<string, string?> header in headers)
+        {
+            request.Headers.Add(header.Key, header.Value);
+        }
+
+        using HttpResponseMessage response = await _httpClient.PostAsync(uri, request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleError(uri, response);
+        }
+    }
+
+    public virtual async Task Put(string uri)
     {
         StringContent request = new StringContent("", Encoding.UTF8, "text/plain");
         using HttpResponseMessage response = await _httpClient.PutAsync(uri, request);
@@ -185,7 +185,7 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Put(string uri, IDictionary<string, string?> headers)
+    public virtual async Task Put(string uri, IDictionary<string, string?> headers)
     {
         StringContent request = new StringContent("", Encoding.UTF8, "text/plain");
 
@@ -202,7 +202,7 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Put<T>(string uri, T value)
+    public virtual async Task Put<T>(string uri, T value)
     {
         string json = JsonSerializer.Serialize(value);
         StringContent request = new StringContent(json, Encoding.UTF8, "application/json");
@@ -214,7 +214,7 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Put<T>(string uri, T value, IDictionary<string, string?> headers)
+    public virtual async Task Put<T>(string uri, T value, IDictionary<string, string?> headers)
     {
         string json = JsonSerializer.Serialize(value);
         StringContent request = new StringContent(json, Encoding.UTF8, "application/json");
@@ -232,7 +232,7 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Delete(string uri)
+    public virtual async Task Delete(string uri)
     {
         using HttpResponseMessage response = await _httpClient.DeleteAsync(uri);
 
@@ -242,7 +242,7 @@ public class JsonHttpClient : IJsonHttpClient
         }
     }
 
-    public async Task Delete(string uri, IDictionary<string, string?> headers)
+    public virtual async Task Delete(string uri, IDictionary<string, string?> headers)
     {
         using HttpRequestMessage request = new HttpRequestMessage()
         {
