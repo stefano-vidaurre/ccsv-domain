@@ -36,7 +36,9 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TUpdate, TQuery,
     protected abstract void UpdateEntity(TEntity entity, TUpdate data);
 }
 
-public abstract class EntityAppService<TEntity, TRead, TCreate, TQuery, TFilter> : IEntityAppService<TRead, TCreate, TQuery, TFilter>
+public abstract class EntityAppService<TEntity, TRead, TCreate, TQuery, TFilter> :
+    EntityAppService<TEntity, TRead, TQuery, TFilter>,
+    IEntityAppService<TRead, TCreate, TQuery, TFilter>
     where TEntity : Entity
     where TRead : EntityReadDto
     where TCreate : EntityCreateDto
@@ -45,12 +47,35 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TQuery, TFilter>
 {
     private readonly IRepository<TEntity> _repository;
     private readonly IMasterValidator _validator;
-    private readonly IMasterMapper _mapper;
 
-    protected EntityAppService(IRepository<TEntity> repository, IMasterMapper mapper, IMasterValidator validator)
+    protected EntityAppService(IRepository<TEntity> repository, IMasterMapper mapper, IMasterValidator validator) : base(repository, mapper)
     {
         _repository = repository;
         _validator = validator;
+    }
+
+    public virtual async Task Create(TCreate data)
+    {
+        _validator.Validate(data);
+        TEntity entity = CreateEntity(data);
+        await _repository.Create(entity);
+    }
+
+    protected abstract TEntity CreateEntity(TCreate data);
+}
+
+public abstract class EntityAppService<TEntity, TRead, TQuery, TFilter> : IEntityAppService<TRead, TQuery, TFilter>
+    where TEntity : Entity
+    where TRead : EntityReadDto
+    where TQuery : EntityQueryDto
+    where TFilter : EntityFilterDto
+{
+    private readonly IRepository<TEntity> _repository;
+    private readonly IMasterMapper _mapper;
+
+    protected EntityAppService(IRepository<TEntity> repository, IMasterMapper mapper)
+    {
+        _repository = repository;
         _mapper = mapper;
     }
 
@@ -93,15 +118,6 @@ public abstract class EntityAppService<TEntity, TRead, TCreate, TQuery, TFilter>
     {
         return _repository.Count(query => CreateQuery(query, filter), filter.DisabledIncluded);
     }
-
-    public virtual async Task Create(TCreate data)
-    {
-        _validator.Validate(data);
-        TEntity entity = CreateEntity(data);
-        await _repository.Create(entity);
-    }
-
-    protected abstract TEntity CreateEntity(TCreate data);
 
     public virtual async Task Delete(Guid id)
     {
