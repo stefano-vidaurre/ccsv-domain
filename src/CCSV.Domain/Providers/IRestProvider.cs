@@ -13,9 +13,18 @@ public interface IRestProvider<TRead, TCreate, TUpdate, TQuery, TFilter> : IRest
     Task Update(Guid id, TUpdate data, Guid idempotencyKey);
 }
 
-public interface IRestProvider<TRead, TCreate, TQuery, TFilter>
+public interface IRestProvider<TRead, TCreate, TQuery, TFilter> : IRestProvider<TRead, TQuery, TFilter>
     where TRead : EntityReadDto
     where TCreate : EntityCreateDto
+    where TQuery : EntityQueryDto
+    where TFilter : EntityFilterDto
+{
+    Task Create(TCreate data);
+    Task Create(TCreate data, Guid idempotencyKey);
+}
+
+public interface IRestProvider<TRead, TQuery, TFilter>
+    where TRead : EntityReadDto
     where TQuery : EntityQueryDto
     where TFilter : EntityFilterDto
 {
@@ -28,8 +37,6 @@ public interface IRestProvider<TRead, TCreate, TQuery, TFilter>
     Task<TRead> GetById(Guid id, Guid idempotencyKey);
     Task<TRead?> GetByIdOrDefault(Guid id);
     Task<TRead?> GetByIdOrDefault(Guid id, Guid idempotencyKey);
-    Task Create(TCreate data);
-    Task Create(TCreate data, Guid idempotencyKey);
     Task Delete(Guid id);
     Task Delete(Guid id, Guid idempotencyKey);
     Task Enable(Guid id);

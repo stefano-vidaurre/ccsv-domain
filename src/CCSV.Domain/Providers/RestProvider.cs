@@ -34,9 +34,37 @@ public abstract class RestProvider<TRead, TCreate, TUpdate, TQuery, TFilter> : R
     }
 }
 
-public abstract class RestProvider<TRead, TCreate, TQuery, TFilter> : IRestProvider<TRead, TCreate, TQuery, TFilter>
+public abstract class RestProvider<TRead, TCreate, TQuery, TFilter> : RestProvider<TRead, TQuery, TFilter>, IRestProvider<TRead, TCreate, TQuery, TFilter>
     where TRead : EntityReadDto
     where TCreate : EntityCreateDto
+    where TQuery : EntityQueryDto
+    where TFilter : EntityFilterDto
+{
+    private const string IdempotencyKey = "Idempotency-Key";
+    private readonly IJsonHttpClient _httpClient;
+
+    protected RestProvider(IJsonHttpClient httpClient) : base(httpClient)
+    {
+        _httpClient = httpClient;
+    }
+    public virtual Task Create(TCreate data)
+    {
+        return _httpClient.Post(ResourceUri, data);
+    }
+
+    public virtual Task Create(TCreate data, Guid idempotencyKey)
+    {
+        IDictionary<string, string?> headers = new Dictionary<string, string?>()
+        {
+            { IdempotencyKey, idempotencyKey.ToString() }
+        };
+
+        return _httpClient.Post(ResourceUri, data, headers);
+    }
+}
+
+public abstract class RestProvider<TRead, TQuery, TFilter> : IRestProvider<TRead, TQuery, TFilter>
+    where TRead : EntityReadDto
     where TQuery : EntityQueryDto
     where TFilter : EntityFilterDto
 {
@@ -108,21 +136,6 @@ public abstract class RestProvider<TRead, TCreate, TQuery, TFilter> : IRestProvi
         };
 
         return _httpClient.GetOrDefault<TRead>($"{ResourceUri}/{id}", headers);
-    }
-
-    public virtual Task Create(TCreate data)
-    {
-        return _httpClient.Post(ResourceUri, data);
-    }
-
-    public virtual Task Create(TCreate data, Guid idempotencyKey)
-    {
-        IDictionary<string, string?> headers = new Dictionary<string, string?>()
-        {
-            { IdempotencyKey, idempotencyKey.ToString() }
-        };
-
-        return _httpClient.Post(ResourceUri, data, headers);
     }
 
     public virtual Task Delete(Guid id)
